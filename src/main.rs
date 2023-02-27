@@ -59,6 +59,7 @@ enum Expr {
     ArrayAccess(Var, Var),
     IsEqualLiteral(Var, Literal),
     IsEqualVar(Var, Var),
+    IsNotEqualLiteral(Var, Literal),
     Literal(Literal),
 }
 
@@ -69,6 +70,7 @@ impl fmt::Display for Expr {
             Self::Dec(v) => write!(f, "{} - 1", v),
             Self::ArrayAccess(array, idx) => write!(f, "{} : {}", array, idx),
             Self::IsEqualLiteral(v, l) => write!(f, "{} == {}", v, l),
+            Self::IsNotEqualLiteral(v, l) => write!(f, "{} != {}", v, l),
             Self::IsEqualVar(v, v2) => write!(f, "{} == {}", v, v2),
             Self::Literal(l) => write!(f, "{}", l),
         }
@@ -124,7 +126,6 @@ enum Cmd {
     StartCond(Expr),
     EndIf,
     EndWhile,
-    RickrollCmd(String),
 }
 
 #[derive(Debug)]
@@ -221,9 +222,6 @@ impl Compiler {
                 }
                 Cmd::EndWhile => {
                     writeln!(res, "We know the game and we're gonna play it")?;
-                }
-                Cmd::RickrollCmd(cmd) => {
-                    writeln!(res, "{}", cmd)?;
                 }
             }
         }
@@ -364,7 +362,7 @@ impl Compiler {
             Var::Temp,
             Expr::ArrayAccess(Var::Tape, Var::Pointer),
         ));
-        self.cmds.push(Cmd::StartCond(Expr::IsEqualLiteral(
+        self.cmds.push(Cmd::StartCond(Expr::IsNotEqualLiteral(
             Var::Temp,
             Literal::Int(0),
         )));
