@@ -8,15 +8,19 @@ use std::process;
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
 struct Args {
+    /// Number of spaces per indentation level
     #[arg(long, default_value_t = 2)]
     indent: i64,
 
+    /// Insert debugging trace statements in Rickroll output
     #[arg(long)]
     trace: bool,
 
+    /// Name of output Rickroll file
     #[arg(short)]
     output: String,
 
+    /// Name of input Brainfuck file
     #[arg()]
     file: String,
 }
