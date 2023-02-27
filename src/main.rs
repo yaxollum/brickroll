@@ -1,30 +1,40 @@
 mod compiler;
 
 use crate::compiler::Compiler;
-use std::env;
-use std::fs::read_to_string;
+use clap::Parser;
+use std::fs;
 use std::process;
 
+#[derive(Parser)]
+#[command(author, version, about, long_about = None)]
+struct Args {
+    #[arg(long, default_value_t = 2)]
+    indent: i64,
+
+    #[arg(long)]
+    trace: bool,
+
+    #[arg(short)]
+    output: String,
+
+    #[arg()]
+    file: String,
+}
+
 fn main() {
-    let args: Vec<_> = env::args().collect();
-    let print_help = || eprintln!("Usage: {} <file>", args[0]);
-    if args.len() == 2 {
-        if args[1] == "-h" || args[1] == "--help" {
-            print_help();
-        } else {
-            if let Ok(bf) = read_to_string(&args[1]) {
-                let compiler = Compiler::read(&bf);
-                match compiler.output(2, false) {
-                    Ok(output) => println!("{}", output),
-                    Err(err) => eprintln!("error: {:?}", err),
+    let args = Args::parse();
+    if let Ok(bf) = fs::read_to_string(&args.file) {
+        let compiler = Compiler::read(&bf);
+        match compiler.output(args.indent, args.trace) {
+            Ok(output) => {
+                if let Err(_) = fs::write(&args.output, output) {
+                    eprintln!("Unable to write to file \"{}\"", args.output);
                 }
-            } else {
-                eprintln!("Unable to read file \"{}\"", args[1]);
-                process::exit(1);
             }
+            Err(err) => eprintln!("error: {:?}", err),
         }
     } else {
-        print_help();
+        eprintln!("Unable to read file \"{}\"", args.file);
         process::exit(1);
     }
 }
