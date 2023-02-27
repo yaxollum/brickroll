@@ -110,7 +110,7 @@ impl Function {
             Self::IntToChar(v) => v.to_string(),
             Self::PutChar(v) => v.to_string(),
             Self::ArrayLength(v) => v.to_string(),
-            Self::ReadLine => "hello".to_owned(),
+            Self::ReadLine => "you".to_owned(),
         }
     }
 }
